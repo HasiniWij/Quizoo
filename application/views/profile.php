@@ -40,6 +40,12 @@
 				border-width:0;
 				background-color:white;
 			}
+			.wrapper {
+				display: grid;
+				grid-template-columns: repeat(5, 1fr);
+				gap: 10px;
+				grid-auto-rows: minmax(50px, auto);
+			}
 		</style>
     </head>
     <body>
@@ -91,6 +97,12 @@
 					</button>
                 </div>
 			</div>
+			<div class='row'>
+                <div class='col-md-2'>
+                    <h3>My Quizzes:</h3>
+                </div>
+                <div class='col-md-6' id="quizArea" class="wrapper"></div>
+			</div>
         </div>
 	</div> <!-- container -->
 		
@@ -109,7 +121,8 @@
 				defaults: {
 					email: null,
 					username: null,
-					score: null
+					score: null,
+					quizzes:null
 				}
 			});
 
@@ -142,6 +155,17 @@
 						$( "#emailArea" ).append( "<h3>"+ user.get('email') + "</h3>");
 						$( "#usernameArea" ).append( "<h3>"+ user.get('username') + "</h3>");
 						$( "#scoreArea" ).append( "<h3>"+ user.get('score') + "</h3>");
+						console.log(user);
+						console.log(user.get('quizzes'));
+						if(user.get('quizzes')){
+							user.get('quizzes').forEach(function(quiz) { 
+								$( "#quizArea" ).append( "<button class='buttonStyle' style='margin-left:20px'>"+quiz.title+"</button>");
+								
+							});
+						}
+						else{
+							$( "#quizArea" ).append( "<h3>-</h3>");
+						}
 					},
 					changeUsernameEvent : function (event) {
                         if($("#newUsername").val()){

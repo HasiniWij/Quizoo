@@ -52,6 +52,25 @@ class User extends CI_Model {
         }
     }
 
+    function getUserQuizzes()
+    {
+        $x = $this->db->get_where('users',array('email' => $this->session->email));
+        $user = $x->row_array();
+        	
+                                                  	
+        $res = $this->db->get_where('quiz',array('authorId' => $user['id']));
+        if ($res->num_rows() == 0) {
+            return false;
+        }
+        else {
+            $quizzes = array();
+            foreach ($res->result_array() as $row){
+                $quizzes[] = $row;
+            }
+            return $quizzes;
+        }
+    }
+
     function isUserLoggedIn()
     {
         if(isset($this->session->is_logged_in) && $this->session->is_logged_in == true)       

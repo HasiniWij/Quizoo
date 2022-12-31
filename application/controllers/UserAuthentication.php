@@ -65,8 +65,10 @@ class UserAuthentication extends RestController {
 
     public function user_get()
     {
-        $result = $this->user->getUserDetails();
-        print json_encode($result);
+        $user = $this->user->getUserDetails();
+        $quizzes = $this->user->getUserQuizzes();
+        $userDetails = $user + array('quizzes' => $quizzes);
+        print json_encode($userDetails);
     }
 
     public function user_put()
