@@ -16,8 +16,8 @@ class Quiz extends CI_Model {
         if ($res->num_rows() != 1) {
             return false;
         }
-        $x = $this->db->insert('quiz',array('title' => $title,'category'=>$category,'authorId' => $res->row()->id));
-        if ($x)
+        $result = $this->db->insert('quiz',array('title' => $title,'category'=>$category,'authorId' => $res->row()->id));
+        if ($result)
         {
             $insertId = $this->db->insert_id();
             return $insertId;
@@ -27,56 +27,90 @@ class Quiz extends CI_Model {
         }
     }
 
-    function authenticateUser($email,$enteredPassword)
-    {
-        $res = $this->db->get_where('users',array('email' => $email));
-        if ($res->num_rows() != 1) {
-            return false;
-        }
-        else {
-            $row = $res->row();
-            if (password_verify($enteredPassword,$row->password)) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-    }
-
-    function getUserDetails()
-    {
-        
-        $res = $this->db->get_where('users',array('email' => $this->session->email));
-        if ($res->num_rows() != 1) {
-            return false;
-        }
-        else {
-            $user = $res->row_array();
-            return $user;
-        }
-    }
-
-    function isUserLoggedIn()
-    {
-        if(isset($this->session->is_logged_in) && $this->session->is_logged_in == true)       
-        {
-            return true; 
-        }
-        return false ;  
-    }
-     function updateUser($user)
-     {
-        $this->db->replace('users', $user);
-     }
-
      function getCategories(){
         $this->db->select('category');
         $this->db->distinct();
         $result = $this->db->get('quiz');
         return $result->result_array();
-
      }
+
+     function saveTags($quizId,$tag){
+        $result = $this->db->insert('tag',array('quizId' => $quizId,'tag'=>$tag));
+        if ($result)
+        {
+            return true;
+        }
+        else {
+            return false;
+        }
+     }
+
+     function saveQuestion($quizId,$question){
+        $result = $this->db->insert('questionAnswer',array(
+            'quizId' => $quizId,
+            'question' =>$question['question'],
+            'answerA'=>$question['answerA'],
+            'answerB'=>$question['answerB'],
+            'answerC'=>$question['answerC'],
+            'answerD'=>$question['answerD'],
+            'correctAnswer'=>$question['correctAnswer'],
+    
+        ));
+        if ($result)
+        {
+            return true;
+        }
+        else {
+            return false;
+        }
+     }
+
+
+         //  function updateUser($user)
+    //  {
+    //     $this->db->replace('users', $user);
+    //  }
+
+
+    // function authenticateUser($email,$enteredPassword)
+    // {
+    //     $res = $this->db->get_where('users',array('email' => $email));
+    //     if ($res->num_rows() != 1) {
+    //         return false;
+    //     }
+    //     else {
+    //         $row = $res->row();
+    //         if (password_verify($enteredPassword,$row->password)) {
+    //             return true;
+    //         }
+    //         else {
+    //             return false;
+    //         }
+    //     }
+    // }
+
+    // function getUserDetails()
+    // {
+        
+    //     $res = $this->db->get_where('users',array('email' => $this->session->email));
+    //     if ($res->num_rows() != 1) {
+    //         return false;
+    //     }
+    //     else {
+    //         $user = $res->row_array();
+    //         return $user;
+    //     }
+    // }
+
+    // function isUserLoggedIn()
+    // {
+    //     if(isset($this->session->is_logged_in) && $this->session->is_logged_in == true)       
+    //     {
+    //         return true; 
+    //     }
+    //     return false ;  
+    // }
+
     // function updateName($userId,$username)
     // function updatePassword($userId,$username)
     // function updateScore($userId,$username)

@@ -60,8 +60,19 @@ class QuizController extends RestController {
         
         $data = file_get_contents('php://input');
         $arr = json_decode($data, true);
-        $result = $this->quiz->saveQuiz($arr['title'],$arr['category']);
-        print $result;
+        $quizId = $this->quiz->saveQuiz($arr['title'],$arr['category']);
+       
+        foreach($arr['tags'] as $tag){
+            $this->quiz->saveTags($quizId,$tag);
+        }
+
+        foreach($arr['questionAnswers'] as $question){
+            $this->quiz->saveQuestion($quizId,$question);
+        }
+
+
+        
+        print json_encode($arr['questionAnswers']);
         // $title = $this->input->post('category');
         // $category = $this->input->post();
         // $x = $this->request->body();
