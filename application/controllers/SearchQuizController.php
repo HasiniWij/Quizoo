@@ -18,7 +18,7 @@ use chriskacerguis\RestServer\RestController;
  * @license         MIT
  * @link            https://github.com/chriskacerguis/codeigniter-restserver
  */
-class SearchQuiz extends RestController {
+class SearchQuizController extends RestController {
 
     function __construct()
     {
@@ -28,9 +28,9 @@ class SearchQuiz extends RestController {
         // $this->load->library('session');
         // Configure limits on our controller methods
         // Ensure you have created the 'limits' table and enabled 'limits' within application/config/rest.php
-        // $this->methods['users_get']['limit'] = 500; // 500 requests per hour per user/key
-        // $this->methods['users_post']['limit'] = 100; // 100 requests per hour per user/key
-        // $this->methods['users_delete']['limit'] = 50; // 50 requests per hour per user/key
+        $this->methods['users_get']['limit'] = 500; // 500 requests per hour per user/key
+        $this->methods['users_post']['limit'] = 100; // 100 requests per hour per user/key
+        $this->methods['users_delete']['limit'] = 50; // 50 requests per hour per user/key
     }
 
     public function index_get()
@@ -38,9 +38,19 @@ class SearchQuiz extends RestController {
         $this->load->view('home');
     }
 
-    public function browseQuiz_get()
+    public function browse_get()
     {
         $this->load->view('browse');
+    }
+    
+    public function quizzesOfCategory_get()
+    {
+        // console.log()
+        $queryType = $this->uri->segment(3,false);
+        $query = $this->uri->segment(4,false);
+        // print( $this->uri->segment(3,false))    ;
+        // print($category);
+        $this->load->view('browseQuiz',array('queryType' => $queryType,'query' => $query));
     }
 
 }

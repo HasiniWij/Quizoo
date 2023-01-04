@@ -212,9 +212,10 @@
 						"click .removeQuestion" : "removeQuestionEvent"
 					},
 					initialize : function () {
-						// user.fetch({async:false});
-						// this.emailView = new EmailArea();
-						// this.usernameAreaView = new UsernameAreaView();
+						var id="19";
+						if(id){
+							quiz.fetch({'id':id});
+						}
 						this.render();
 					},
 					render : function () {

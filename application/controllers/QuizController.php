@@ -26,6 +26,7 @@ class QuizController extends RestController {
         // Construct the parent class
         parent::__construct();
         $this->load->model('quiz');
+        $this->load->model('user');
         // Configure limits on our controller methods
         // Ensure you have created the 'limits' table and enabled 'limits' within application/config/rest.php
         $this->methods['users_get']['limit'] = 500; // 500 requests per hour per user/key
@@ -46,7 +47,8 @@ class QuizController extends RestController {
 
     public function editQuestion_get()
     {
-        $this->load->view('editQuestionAnswer.php');
+        $id =  $this->uri->segment(3,false);
+        $this->load->view('editQuestionAnswer',$id);
     }
     
     public function addQuiz_get()
@@ -55,6 +57,37 @@ class QuizController extends RestController {
         console.log($title);
         $this->load->view('editQuestionAnswer.php');
     }
+    public function quiz_get()
+    {
+        // write three functions wihtout if (get quizzes and get quiz, etc)
+        $queryType =  $this->uri->segment(3,false);
+        $query = $this->uri->segment(4,false);
+        if($queryType==='category'){
+            $quizzes = $this->quiz->getQuizzesFromCategory($query);
+        }
+        else if($queryType==='tag'){
+            
+            // print
+        }
+        else{
+            $quizzesDetails = $this->quiz->getQuiz($query);
+            $questionAnswers = $this->quiz->getQuestionAnswers($query);
+            $quizzes = $quizzesDetails + array('questionAnswers' => $questionAnswers);
+        }
+        print json_encode($quizzes);
+    }
+    public function quizzesFromTag_get(){
+        $searchWords =  $this->uri->segment(3,false);
+        $quizzes = $this->quiz->getQuizzesFromTag($searchWords);
+        print $quizzes;
+    }
+
+    public function viewQuiz_get()
+    {
+        $quizId =  $this->uri->segment(3,false);
+        $this->load->view('viewQuiz.php',array('quizId' => $quizId));
+    }
+
     public function quiz_post()
     {
         
@@ -95,6 +128,15 @@ class QuizController extends RestController {
     {
         $categories = $this->quiz->getCategories();
         print json_encode($categories);
+        // $this->quiz->saveQuiz($input);
+    }
+
+    public function finishQuiz_get()
+    {
+        $score =  $this->uri->segment(3,false);
+        $this->load->view('finishQuiz',array('score' => $score));
+        // $categories = $this->quiz->getCategories();
+        // print json_encode($categories);
         // $this->quiz->saveQuiz($input);
     }
  

@@ -65,6 +65,64 @@ class Quiz extends CI_Model {
         }
      }
 
+     function getQuizzesFromCategory($category){
+        $res = $this->db->get_where('quiz',array('category' => $category));
+        if ($res->num_rows() == 0) {
+            return false;
+        }
+        else {
+            $quizzes = array();
+            foreach ($res->result_array() as $row){
+                $quizzes[] = $row;
+            }
+            return $quizzes;
+        }
+     }
+
+    function getQuizzesFromTag($tag){
+        $res = $this->db->get_where('tag',array('tag' => $tag));
+        if ($res->num_rows() == 0) {
+            return false;
+        }
+        else {
+            $quizIds = array();
+            foreach ($res->result_array() as $row){
+                $quizIds[] = $row['quizId'];
+            }
+
+            print $quizIds;
+            // $query = $this->db->where_in("quizId", $quizIds)->get("quiz");
+
+            //  return $query->result_array();
+            // return $quizzes;
+        }
+    }
+
+    function getQuiz($quizId){
+        $res = $this->db->get_where('quiz',array('quizId' => $quizId));
+        if ($res->num_rows() != 1) {
+            return false;
+        }
+        else {
+            $quiz = $res->row_array();
+            return $quiz;
+        }
+    }
+
+    function getQuestionAnswers($quizId){
+        $res = $this->db->get_where('questionAnswer',array('quizId' => $quizId));
+        if ($res->num_rows() == 0) {
+            return false;
+        }
+        else {
+            $questions = array();
+            foreach ($res->result_array() as $row){
+                $questions[] = $row;
+            }
+            return $questions;
+        }
+     }
+    
 
          //  function updateUser($user)
     //  {

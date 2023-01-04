@@ -134,18 +134,16 @@ class UserAuthentication extends RestController {
         $this->load->view('signin');
     }
 
-
-    public function browse_get()
+    public function score_post()
     {
-        $this->load->view('browse');
+        $score =  $this->uri->segment(3,false);
+        // print $score;
+        $this->user->updateScore($score);
     }
+    // public function updat
 
-    public function browseQuiz_get()
-    {
-        $this->load->view('browse');
-    }
 
-    // , view register page, leaderboard, profile
+    // , view leaderboard, 
     
 
 }

@@ -144,7 +144,8 @@
 						"click #changeUsername" : "changeUsernameEvent",
 						"click #editUsername" : "editUsernameEvent",
 						"click #cancel" : "cancelEditEvent",
-						"click #changePassword" : "changePasswordEvent"
+						"click #changePassword" : "changePasswordEvent",
+						"click .quizButton" :"quizButtonEvent"
 					},
 					initialize : function () {
 						user.fetch({async:false});
@@ -159,7 +160,7 @@
 						console.log(user.get('quizzes'));
 						if(user.get('quizzes')){
 							user.get('quizzes').forEach(function(quiz) { 
-								$( "#quizArea" ).append( "<button class='buttonStyle' style='margin-left:20px'>"+quiz.title+"</button>");
+								$( "#quizArea" ).append( "<button class='buttonStyle quizButton' style='margin-left:20px' data-id='"+quiz.quizId+"'>"+quiz.title+"</button>");
 								
 							});
 						}
@@ -198,6 +199,11 @@
 							// console.log(result.responseJSON);
 							// getResponseHeader
                     	}
+					},
+					quizButtonEvent: function(event){
+						var id = $(event.currentTarget).data('id');
+						console.log(id)
+						window.location.href="<?php echo base_url()?>index.php/quizController/editQuiz/"+id;
 					}
 				}
 			)

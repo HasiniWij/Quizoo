@@ -110,6 +110,29 @@ class User extends CI_Model {
         
      }
 
+     function updateScore($score)
+     {
+        $email = $this->session->email;
+        $res = $this->db->get_where('users',array('email' => $email));
+        if ($res->num_rows() != 1) {
+            return false;
+        }
+   
+        $id =  $res->row()->id;
+
+        $this->db->where('id', $id);
+        $this->db->set('score', 'score+'.$score, FALSE);
+        $result = $this->db->update('users');
+
+        if($result)       
+        {
+            return true; 
+        }
+        return false ;  
+        
+     }
+
+
      
     // function updateName($userId,$username)
     // function updatePassword($userId,$username)

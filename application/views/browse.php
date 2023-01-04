@@ -70,12 +70,15 @@
 						var self = this;
 							categories.each(function (c) {
 								console.log(c.get('category'));
-								var button = "<button type='button' id='categoryButton'>" + c.get('category')  + "</button>";
+								var button = "<button type='button' id='categoryButton' data-category="+c.get('category')+">" + c.get('category')  + "</button>";
 								$( "#buttonArea" ).append(button);
 							})
 					},
 					selectCategoryEvent : function (event) {
-						document.location.href = "<?php echo base_url()?>index.php/userAuthentication/home";
+						// console.log("ins")
+						var category = $(event.currentTarget).data('category');
+						// console.log(tagNumber)/
+						document.location.href = "<?php echo base_url()?>index.php/SearchQuizController/quizzesOfCategory/category/"+category;
 						// location.href='https://google.com';
 						// window.location.pathname = ('/newpage.html')
 						// $('.cname').remove()
