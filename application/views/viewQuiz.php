@@ -133,7 +133,7 @@
 		$(document).ready(function () {
 			var Quiz = Backbone.Model.extend({
 				url: function () {
-					return "<?php echo base_url() ?>index.php/QuizController/quiz/id/<?php echo $quizId ?>";
+					return "<?php echo base_url() ?>index.php/QuizController/quiz/<?php echo $quizId ?>";
 				},
 				idAttribute: "quizId",
 				defaults: {

@@ -350,7 +350,7 @@
 					},
 					addTagEvent : function (event) {
 						console.log("Add tag");
-						var newTag = $("#tag").val();
+						var newTag = $("#tag").val().toLowerCase();
 						if(newTag){
 							tagObjects.push({"tag":newTag,"id":tagCount});
 							$( "#tagArea" ).append( '<div class="tagStyle" id="tagDiv'+tagCount+'"><p>'+newTag+'</p><button id="'+tagCount+'" class="removeTag" data-tagnum="'+tagCount+'">X</button></div>' );

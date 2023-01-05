@@ -56,7 +56,7 @@
 			</div>
 			<div class='row' style="margin-left:35%">
 				<div class='col-md-6'>
-					<input type="search" class="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon" id="keywords"/>
+					<input type="search" class="form-control rounded" placeholder="Search quizzes by a tag or category" aria-label="Search" aria-describedby="search-addon" id="keywords"/>
 				</div>
 				<div class='col-md-6'>
 					<button type="button" id="searchButton" style="  

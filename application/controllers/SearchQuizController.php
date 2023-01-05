@@ -45,11 +45,8 @@ class SearchQuizController extends RestController {
     
     public function quizzesOfCategory_get()
     {
-        // console.log()
         $queryType = $this->uri->segment(3,false);
         $query = $this->uri->segment(4,false);
-        // print( $this->uri->segment(3,false))    ;
-        // print($category);
         $this->load->view('browseQuiz',array('queryType' => $queryType,'query' => $query));
     }
 

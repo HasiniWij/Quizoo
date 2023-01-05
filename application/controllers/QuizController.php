@@ -59,27 +59,29 @@ class QuizController extends RestController {
     }
     public function quiz_get()
     {
-        // write three functions wihtout if (get quizzes and get quiz, etc)
+        $id =  $this->uri->segment(3,false);
+        $quizzesDetails = $this->quiz->getQuiz($id);
+        $questionAnswers = $this->quiz->getQuestionAnswers($id);
+        $quizzes = $quizzesDetails + array('questionAnswers' => $questionAnswers);
+        print json_encode($quizzes);
+    }
+
+    public function quizzes_get(){
         $queryType =  $this->uri->segment(3,false);
         $query = $this->uri->segment(4,false);
+      
         if($queryType==='category'){
             $quizzes = $this->quiz->getQuizzesFromCategory($query);
         }
         else if($queryType==='tag'){
-            
-            // print
-        }
-        else{
-            $quizzesDetails = $this->quiz->getQuiz($query);
-            $questionAnswers = $this->quiz->getQuestionAnswers($query);
-            $quizzes = $quizzesDetails + array('questionAnswers' => $questionAnswers);
+            $query = strtolower($query);
+            $quizzes = $this->quiz->getQuizzesFromTag($query);
+            $quizzesFromCategory = $this->quiz->getQuizzesFromCategory($query);
+            if($quizzesFromCategory){
+                $quizzes = array_merge($quizzesFromCategory, $quizzes);
+            }
         }
         print json_encode($quizzes);
-    }
-    public function quizzesFromTag_get(){
-        $searchWords =  $this->uri->segment(3,false);
-        $quizzes = $this->quiz->getQuizzesFromTag($searchWords);
-        print $quizzes;
     }
 
     public function viewQuiz_get()

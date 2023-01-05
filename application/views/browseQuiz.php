@@ -54,7 +54,7 @@
 			var Quizzes = Backbone.Collection.extend(
 				{
 					model : Quiz,
-					url: "<?php echo base_url() ?>index.php/QuizController/quiz/<?php echo $queryType ?>/<?php echo $query ?>"
+					url: "<?php echo base_url() ?>index.php/QuizController/quizzes/<?php echo $queryType ?>/<?php echo $query ?>"
 				}
 			);
 
@@ -75,6 +75,9 @@
 					},
 					render : function () {
 						var self = this;
+						if(quizzes.length==0){
+							$( "#buttonArea" ).append("<h2>No results found</h2>");
+						}
 						quizzes.each(function (quiz) {
 								// console.log(c.get('category'));
 								var button = "<button type='button' class='quizButton' data-quiz="+quiz.get('quizId')+"> <div>" + quiz.get('title')  + "</div><div>"+quiz.get('numberOfLikes')  +" Likes</div></button>";

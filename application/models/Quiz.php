@@ -82,19 +82,27 @@ class Quiz extends CI_Model {
     function getQuizzesFromTag($tag){
         $res = $this->db->get_where('tag',array('tag' => $tag));
         if ($res->num_rows() == 0) {
-            return false;
+            return array();
         }
         else {
             $quizIds = array();
+            $quizzes = array();
             foreach ($res->result_array() as $row){
                 $quizIds[] = $row['quizId'];
             }
 
-            print $quizIds;
-            // $query = $this->db->where_in("quizId", $quizIds)->get("quiz");
+            $this->db->where_in('quizId', $quizIds);
+            $result = $this->db->get('quiz'); 
 
-            //  return $query->result_array();
-            // return $quizzes;
+            if ($result->num_rows() == 0) {
+                return [];
+            }
+            else{
+                foreach ($result->result_array() as $row){
+                    $quizzes[] = $row;
+                }
+            }
+            return  $quizzes;
         }
     }
 
