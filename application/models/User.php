@@ -131,8 +131,80 @@ class User extends CI_Model {
         return false ;  
         
      }
+     function getUserRank()
+     {
+        $email = $this->session->email;
+        // $res = $this->db->get_where('users',array('email' => $email));
+        // if ($res->num_rows() != 1) {
+        //     return false;
+        // }
+        // else{
+        $this->db->select('username,email, score');
+        $this->db->order_by('score', 'DESC');
+        $result = $this->db->get('users'); 
 
+        // $id =  $res->row()->id;
+            if ($result->num_rows() == 0) {
+                return [];
+            }
+            else{
+                $users = array();
+                foreach ($result->result_array() as $row){
+                    $users[] = $row;
+                    // $row->username;
 
+                }
+            }
+            // $x = array();
+            // foreach ( $users as $element ) {
+            //     if ( $email == $element->email ) {
+            //         $x[] = $element;
+            //         // return $element;
+            //     }
+            // }
+        
+                return $users[0];
+        }
+                // $users = array();
+                // foreach ($result->result_array() as $row){
+                //     // $users[] = $row->username;
+                // }
+                // return $users[0];
+                // $user=array();
+                // $count = 0; 
+                // foreach ($result->result_array() as $row){
+                //     $count = $count + 1;
+                //   if( $row->email == $email){
+                //     $user[] = $row;
+                //     $user[] = $count;
+                //   }
+                // }
+                // return $user;
+            
+        // }
+     
+     function getMaxScoreUsers()
+     {
+      
+        $this->db->select('username, score');
+        $this->db->order_by('score', 'DESC');
+        $this->db->limit(2);
+        $result = $this->db->get('users'); 
+
+        if ($result->num_rows() == 0) {
+            return [];
+        }
+        else{
+            $users = array();
+            foreach ($result->result_array() as $row){
+                $users[] = $row;
+            }
+            return $users;
+        }
+        
+    }
+
+     
      
     // function updateName($userId,$username)
     // function updatePassword($userId,$username)

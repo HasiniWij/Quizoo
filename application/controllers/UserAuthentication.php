@@ -48,6 +48,24 @@ class UserAuthentication extends RestController {
         }
     }
 
+    public function leaderbord_get()
+    {
+      $this->load->view('leaderboad');
+        
+    }
+
+    public function maxScoreUsers_get()
+    {
+        // print json_encode(array('users' => $users,'msg' => 'Success'));
+        $users = $this->user->getMaxScoreUsers();
+        print json_encode($users);
+    }
+    public function userRank_get()
+    {
+        $user = $this->user->getUserRank();
+        print json_encode($user);
+    }
+    
     public function home_get()
     {
         if($this->user->isUserLoggedIn()){

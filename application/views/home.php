@@ -29,7 +29,7 @@
             		</a>
 				</div>
 				<div class='col-md-5' style="float:right ;">
-					<a href="#">
+					<a href="<?php echo base_url()?>index.php/userAuthentication/leaderbord">
                 		<img src="<?php echo base_url() ?>/application/resource/score.png" alt="score">
             		</a>
 					<a href="<?php echo base_url()?>index.php/quizController/editQuiz">

@@ -104,20 +104,8 @@ class QuizController extends RestController {
         foreach($arr['questionAnswers'] as $question){
             $this->quiz->saveQuestion($quizId,$question);
         }
-
-
-        
+   
         print json_encode($arr['questionAnswers']);
-        // $title = $this->input->post('category');
-        // $category = $this->input->post();
-        // $x = $this->request->body();
-        // print json_decode( $category) ;
-        // print($title);
-        // print($x);
-        
-        // print 'x';
-        // $input = $this->input->post();
-        // $this->quiz->saveQuiz($input);
     }
     public function createQuiz_post()
     {
