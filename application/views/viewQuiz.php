@@ -226,7 +226,7 @@
 						console.log(questionNumber);
 						if(quiz.get('questionAnswers').length<questionNumber){
 							user.save();
-							window.location.href = '<?php echo base_url()?>index.php/QuizController/finishQuiz/'+score;
+							window.location.href = '<?php echo base_url()?>index.php/QuizController/viewFinishQuiz/'+score;
 							console.log("finish")
 							console.log(score)
 						}
