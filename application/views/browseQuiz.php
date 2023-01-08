@@ -5,27 +5,46 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 		
 		<style>
+			.quizArea{
+				width: 250px;
+				height: 130px;
+				margin: 30px;
+				background-color: #4D47C3;
+				display: inline-block;
+			}
+			#likeButton{
+				background-color: #4D47C3;
+				border: none;
+				float:right;
+			}
+			img{
+				height:35px;
+			}
 			.quizButton{
 				background-color: #4D47C3;
 				border: none;
 				color: white;
 				text-align: center;
 				text-decoration: none;
-				display: inline-block;
 				font-size: 14px;
 				cursor: pointer;
-				font-size: 30px;
-				width: 250px;
-				height: 130px;
-				margin: 30px;
+			}
+			.titleArea{
+				height: 70px;
+				text-align: center;
+			}
+			.bottomArea{
+				height: 60px;
+			}
+			.row{
+				margin-left:0;
 			}
 		</style>
     </head>
     <body>
 	<div class="container" id="contentArea">
 		<div class='row' style="text-align: center; padding-top:5%">
-	       	<h1><?php echo $query ?></h1>
-			  
+	       	<h1><?php echo $query ?></h1>  
 		</div>
 		<div id="buttonArea"></div>	
 	</div>
@@ -38,18 +57,13 @@
 		<script language="Javascript">
 		$(document).ready(function () {
 			var Quiz = Backbone.Model.extend({
-				// url: function () {s
-				// 	return "<?php echo base_url() ?>index.php/Celebs/celeb?name=";
-				// },
-				idAttribute: "quizId",
+				url: function () {
+					return "<?php echo base_url() ?>index.php/QuizController/voteQuiz";
+				},
 				defaults: {
 					category: null
 				}
 			});
-
-			// var category = " <?php echo $query ?>";
-
-
 
 			var Quizzes = Backbone.Collection.extend(
 				{
@@ -58,44 +72,85 @@
 				}
 			);
 
-			// create collections object
-			var quizzes = new Quizzes();
+			var UserLikedQuizzes = Backbone.Collection.extend(
+				{
+					model : Quiz,
+					url: "<?php echo base_url() ?>index.php/QuizController/userLikedQuizzes"
+				}
+			);
 
+			var quiz = new Quiz();
+			var quizzes = new Quizzes();
+			var userLikedQuizzes = new UserLikedQuizzes();
+			var likedQuizzes=[];
 			var ContentAreaView = Backbone.View.extend(
 				{
-					model: quizzes, // connect view to collections object
+					model: quiz, // connect view to collections object
 					el : $('#contentArea'), // connect view to page area
 					events : {
-						"click .quizButton" : "selectCategoryEvent"
+						"click .quizButton" : "selectCategoryEvent",
+						"click #likeButton" : "likeButtonEvent"
 					},
 					initialize : function () {
 						quizzes.fetch({async:false});
-						console.log(quizzes);
+						userLikedQuizzes.fetch({async:false});
 						this.render();
 					},
 					render : function () {
+						
+						$( "#buttonArea" ).empty();
+						likedQuizzes=[];
+						userLikedQuizzes.each(function(quiz) {
+							likedQuizzes.push(quiz.get('quizId'));
+						});
+						console.log(likedQuizzes)
 						var self = this;
 						if(quizzes.length==0){
 							$( "#buttonArea" ).append("<h2>No results found</h2>");
 						}
 						quizzes.each(function (quiz) {
-								// console.log(c.get('category'));
-								var button = "<button type='button' class='quizButton' data-quiz="+quiz.get('quizId')+"> <div>" + quiz.get('title')  + "</div><div>"+quiz.get('numberOfLikes')  +" Likes</div></button>";
-								$( "#buttonArea" ).append(button);
-							})
+							var button = 
+								`<div class='container quizArea'>
+									<div class='row'>
+										<button type='button' class='quizButton' data-quiz=`+quiz.get('quizId')+`> 
+											<div class='titleArea'><h2>` + quiz.get('title')  + `</h2></div>
+										</button>
+									</div>
+										<div class='row bottomArea'>
+										<div class='col-sm-6'>
+											<p style='color:white'>`+quiz.get('numberOfLikes')  +` Likes</p>
+										</div>
+										<div class='col-sm-6'>
+											<button id="likeButton" data-id='`+quiz.get('quizId')+`'>`+(likedQuizzes.includes(quiz.get('quizId'))?`
+												<img src="<?php echo base_url() ?>/application/resource/redHeart.png" alt="like">`:
+												`<img src="<?php echo base_url() ?>/application/resource/heart.png" alt="unlike">`)+`
+											</button>
+										</div>
+									</div>
+								</div>`;	
+							$( "#buttonArea" ).append(button);
+						})
 					},
+
 					selectCategoryEvent : function (event) {
 						var quizId = $(event.currentTarget).data('quiz');
-						console.log(quizId);
-						// console.log(tagNumber)/
 						document.location.href = "<?php echo base_url()?>index.php/quizController/viewQuiz/"+quizId;
-						// location.href='https://google.com';
-						// window.location.pathname = ('/newpage.html')
-						// $('.cname').remove()
-						// $(event.currentTarget).parent().append("<div class='cname'>"
-						// 	+ celebs.get(event.currentTarget.id).get('name') + " is <br/>"
-						// 	+ celebs.get(event.currentTarget.id).get('age') + " years old"
-						// 	+ "</div>")
+					},
+					likeButtonEvent : function (event) {
+						var quizId = $(event.currentTarget).data('id');
+						var vote = "like";
+						if(likedQuizzes.includes(quizId.toString())){
+							vote = "unlike";
+						}
+						quiz.save({
+								"vote": vote,
+								"quizId":quizId
+							},
+							{error: function(){ 
+								console.log("in");
+								contentArea.initialize()
+							}
+						})
 					}
 				}
 			)

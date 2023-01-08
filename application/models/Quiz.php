@@ -130,70 +130,84 @@ class Quiz extends CI_Model {
             return $questions;
         }
      }
+
+    function likeQuiz($quizId){
+        $email = $this->session->email;
+        $res = $this->db->get_where('users',array('email' => $email));
+        if ($res->num_rows() != 1) {
+            return false;
+        }
+        $result = $this->db->insert('userQuiz',array('quizId' => $quizId,'userId' => $res->row()->id));
+        if ($result)
+        {
+            return true;
+        }
+        else {
+            return false;
+        }
+     }
+
+     function unlikeQuiz($quizId){
+        $email = $this->session->email;
+        $res = $this->db->get_where('users',array('email' => $email));
+        if ($res->num_rows() != 1) {
+            return false;
+        }
+        $this->db->where(array('quizId' => $quizId,'userId' => $res->row()->id));
+        $result = $this->db->delete('userQuiz');
+        if ($result)
+        {
+            return true;
+        }
+        else {
+            return false;
+        }
+     }
+
+     function updateNumberOfQuizLikes($vote,$quizId){
+
+        $this->db->where('quizId', $quizId);
+        if($vote=='like'){
+            $this->db->set('numberOfLikes', 'numberOfLikes+1', FALSE);
+        }
+        else{
+            $this->db->set('numberOfLikes', 'numberOfLikes-1', FALSE);
+        }
+
+        $result=$this->db->update('quiz');
+
+        if ($result)
+        {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    function getUserLikedQuizzes(){
+        
+        $quizzes = array();
+        $email = $this->session->email;
+        $res = $this->db->get_where('users',array('email' => $email));
+        if ($res->num_rows() != 1) {
+            return false;
+        }
+
+        $result = $this->db->get_where('userQuiz',array('userId' => $res->row()->id));
+        if ($result->num_rows() !== 0) {
+            foreach ($result->result_array() as $row){
+                $quizzes[] = $row;
+
+            }
+        }
+
+        return $quizzes;
+     }
+
+
     
 
-         //  function updateUser($user)
-    //  {
-    //     $this->db->replace('users', $user);
-    //  }
-
-
-    // function authenticateUser($email,$enteredPassword)
-    // {
-    //     $res = $this->db->get_where('users',array('email' => $email));
-    //     if ($res->num_rows() != 1) {
-    //         return false;
-    //     }
-    //     else {
-    //         $row = $res->row();
-    //         if (password_verify($enteredPassword,$row->password)) {
-    //             return true;
-    //         }
-    //         else {
-    //             return false;
-    //         }
-    //     }
-    // }
-
-    // function getUserDetails()
-    // {
-        
-    //     $res = $this->db->get_where('users',array('email' => $this->session->email));
-    //     if ($res->num_rows() != 1) {
-    //         return false;
-    //     }
-    //     else {
-    //         $user = $res->row_array();
-    //         return $user;
-    //     }
-    // }
-
-    // function isUserLoggedIn()
-    // {
-    //     if(isset($this->session->is_logged_in) && $this->session->is_logged_in == true)       
-    //     {
-    //         return true; 
-    //     }
-    //     return false ;  
-    // }
-
-    // function updateName($userId,$username)
-    // function updatePassword($userId,$username)
-    // function updateScore($userId,$username)
-    // function update($userId,$username)
-    // function getHighestScoreUsers($userId,$username)
-
-    // function updateName($userId,$username)
-    // {
-    //     $res = $this->db->get_where('users',array('email' => $email, 'password' => $password));
-    //     if ($res->num_rows() != 1) {
-    //         return false;
-    //     }
-    //     else {
-    //         $row = $res->row();
-    //         return $row['userId']; 
-    //     }
-    // }
 
   
 

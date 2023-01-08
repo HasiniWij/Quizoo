@@ -22,15 +22,9 @@ class UserAuthentication extends RestController {
 
     function __construct()
     {
-        // Construct the parent class
         parent::__construct();
         $this->load->model('user');
         $this->load->library('session');
-        // Configure limits on our controller methods
-        // Ensure you have created the 'limits' table and enabled 'limits' within application/config/rest.php
-        $this->methods['users_get']['limit'] = 500; // 500 requests per hour per user/key
-        $this->methods['users_post']['limit'] = 100; // 100 requests per hour per user/key
-        $this->methods['users_delete']['limit'] = 50; // 50 requests per hour per user/key
     }
 
     public function index_get()
@@ -56,7 +50,6 @@ class UserAuthentication extends RestController {
 
     public function maxScoreUsers_get()
     {
-        // print json_encode(array('users' => $users,'msg' => 'Success'));
         $users = $this->user->getMaxScoreUsers();
         print json_encode($users);
     }
