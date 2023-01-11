@@ -1,17 +1,10 @@
 <!DOCTYPE html>
     <html lang="en">
     <head>
-        <title>Quizoo</title>
-		<!-- Latest compiled and minified CSS -->
+        <title>Quizo</title>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 		
 		<style>
-			/* body { padding-top: 70px; } needed to position navbar properly */
-			img {
-				height: 60px;
-				width:60px;
-				padding-right:5px;
-			}
             .form-control{
                 margin-top:6%;
             }
@@ -46,13 +39,26 @@
 				gap: 10px;
 				grid-auto-rows: minmax(50px, auto);
 			}
+			.editIconStyle{
+				width:25px;
+				height:25px;
+				margin-top:15px;
+				margin-left:5px;
+			}
+			.quizButtonStyle{
+				margin-left:20px;
+			}
+			.titleStyle{
+				text-align: center;
+			}
+			.usernameStyle{margin:0;}
+			.renameButtonStyle{margin-top:10%}
+			.cancelButtonStyle{margin-top:5%;background-color:grey; margin-left:-10%}
 		</style>
     </head>
     <body>
 	<div>
-			
-	
-		<div style="text-align: center;">
+		<div class="titleStyle">
 	       	<h1>Profile</h1>
 		</div>
         <div class="container" id="contentArea">
@@ -63,12 +69,12 @@
                 <div class='col-md-6'id="emailArea" ></div>
 			</div>
             <div class='row'>
-                <div class='col-md-1' style="margin:0;">
+                <div class='col-md-1 usernameStyle'>
                     <h3>Username:</h3>
                 </div>
 				<div class='col-md-1' id="pencilArea"> 
 					<button type="button" id="editUsername">
-						<img src="<?php echo base_url() ?>/application/resource/edit.png" alt="edit" style="width:25px; height:25px; margin-top:15px; margin-left:5px ">
+						<img src="<?php echo base_url() ?>/application/resource/edit.png" class="editIconStyle" alt="edit">
 					</button>
                 </div>
                 <div class='col-md-3' id="usernameArea"></div>	
@@ -104,7 +110,7 @@
                 <div class='col-md-6' id="quizArea" class="wrapper"></div>
 			</div>
         </div>
-	</div> <!-- container -->
+	</div> 
 		
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
@@ -129,15 +135,18 @@
 			var user = new User();
 
 			function resetUsernameArea() {
-				$( "#pencilArea" ).append( '<button type="button" id="editUsername"><img src="<?php echo base_url() ?>/application/resource/edit.png" alt="edit" style="width:25px; height:25px; margin-top:15px; margin-left:5px "></button>' );
+				$( "#pencilArea" ).append( 
+					`<button type="button" id="editUsername">
+						<img src="<?php echo base_url() ?>/application/resource/edit.png" alt="edit" class="editIconStyle">
+					</button>`
+				);
 				$( "#usernameArea" ).empty();
 				$( "#usernameArea" ).append( "<h3>"+ user.get('username') + "</h3>");
 				$( "#usernameButtonArea" ).empty();
 				$( "#cancelButtonArea" ).empty();
 			}
 
-			var ContentAreaView = Backbone.View.extend(
-				{
+			var ContentAreaView = Backbone.View.extend({
 					model: user, 
 					el : $('#contentArea'), 
 					events : {
@@ -152,16 +161,16 @@
 						this.render();
 					},
 					render : function () {
-						var self = this;
 						$( "#emailArea" ).append( "<h3>"+ user.get('email') + "</h3>");
 						$( "#usernameArea" ).append( "<h3>"+ user.get('username') + "</h3>");
 						$( "#scoreArea" ).append( "<h3>"+ user.get('score') + "</h3>");
-						console.log(user);
-						console.log(user.get('quizzes'));
 						if(user.get('quizzes')){
 							user.get('quizzes').forEach(function(quiz) { 
-								$( "#quizArea" ).append( "<button class='buttonStyle quizButton' style='margin-left:20px' data-id='"+quiz.quizId+"'>"+quiz.title+"</button>");
-								
+								$( "#quizArea" ).append( 
+									"<button class='buttonStyle quizButton quizButtonStyle' data-id='"+quiz.quizId+"'>"
+										+quiz.title+
+									"</button>"
+								);
 							});
 						}
 						else{
@@ -171,17 +180,25 @@
 					changeUsernameEvent : function (event) {
                         if($("#newUsername").val()){
 							var result = user.save({username : $("#newUsername").val()});
-							console.log(result);
 							resetUsernameArea();
                         }
 					},
 					editUsernameEvent : function (event) {
-						// console.log('x');
 						$( "#pencilArea" ).empty();
 						$( "#usernameArea" ).empty();
-						$( "#usernameArea" ).append( "<input type='text' class=form-control rounded' id='newUsername' placeholder='Enter username'/>" );
-						$( "#usernameButtonArea" ).append( "<button type='button' id='changeUsername' class='buttonStyle' style='margin-top:10%'>Change username</button>" );
-						$( "#cancelButtonArea" ).append( "<button type='button' id='cancel' class='buttonStyle' style='margin-top:5%;background-color:grey; margin-left:-10%'>Cancel</button>" );
+						$( "#usernameArea" ).append( 
+							"<input type='text' class=form-control rounded' id='newUsername' placeholder='Enter username'/>"
+						);
+						$( "#usernameButtonArea" ).append(
+							 `<button type='button' id='changeUsername' class='buttonStyle renameButtonStyle'>
+							 	Change username
+							</button>`
+						);
+						$( "#cancelButtonArea" ).append( 
+							`<button type='button' id='cancel' class='buttonStyle cancelButtonStyle'>
+								Cancel
+							</button>`
+						 );
 					
 					},
 					cancelEditEvent : function (event) {
@@ -194,34 +211,15 @@
 								newPassword:$("#newPassword").val()
 							});
 							document.getElementById('password').value = '';
-							document.getElementById('newPassword').value = '';;
-							console.log(result);
-							// console.log(result.responseJSON);
-							// getResponseHeader
+							document.getElementById('newPassword').value = '';
                     	}
 					},
 					quizButtonEvent: function(event){
 						var id = $(event.currentTarget).data('id');
-						console.log(id)
-						window.location.href="<?php echo base_url()?>index.php/quizController/editQuiz/"+id;
+						window.location.href="<?php echo base_url()?>index.php/quizController/editQuizView/"+id;
 					}
-				}
-			)
+			})
 			
-		
-
-			// var Celebrities = Backbone.Collection.extend(
-			// 	{
-			// 		model : Celeb,
-			// 		url: "http://localhost:8999/6cosc005w/ilikecelebs/index.php/celebs/celeb"
-			// 	}
-			// )
-            // var self = this;
-            //             var cimg = "<div class='row'><div class='col-md-2'><h3>Email:</h3></div><div class='col-md-6'> <h3>"+ 
-            //            user.get('email') +
-            //            "</h3> </div> </div>  <div class='row'> <div class='col-md-2'> <h3>Username:</h3>  </div> <div class='col-md-6'> <h3>
-            //            user.get('username') + "</h3>  </div></div>"
-			// create collections object
 			var contentView = new ContentAreaView();
 			
 		});

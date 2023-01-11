@@ -1,6 +1,5 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-// https://www.figma.com/file/LpoyRh9WIOJVAUoiQCxk9e/Server-side?node-id=0%3A1&t=zpeBGX8tGwSGDgll-0
 class User extends CI_Model {
     public function __construct()
     {
@@ -14,7 +13,8 @@ class User extends CI_Model {
         $hashed_password = password_hash($password,PASSWORD_DEFAULT);
         if ($this->db->insert('users',array('email' => $email,'password'=>$hashed_password,'username' => $username)))
         {
-            return true;
+            $insertId = $this->db->insert_id();
+            return $insertId;
         }
         else {
             return false;
@@ -23,48 +23,42 @@ class User extends CI_Model {
 
     function authenticateUser($email,$enteredPassword)
     {
-        $res = $this->db->get_where('users',array('email' => $email));
-        if ($res->num_rows() != 1) {
+        $result = $this->db->get_where('users',array('email' => $email));
+        if ($result->num_rows() != 1) {
             return false;
         }
         else {
-            $row = $res->row();
+            $row = $result->row();
             if (password_verify($enteredPassword,$row->password)) {
-                return true;
+                return $result->row()->id;
             }
             else {
                 return false;
             }
         }
     }
-    
 
     function getUserDetails()
     {
-        
-        $res = $this->db->get_where('users',array('email' => $this->session->email));
-        if ($res->num_rows() != 1) {
+        $result = $this->db->get_where('users',array('id' => $this->session->id));
+        if ($result->num_rows() != 1) {
             return false;
         }
         else {
-            $user = $res->row_array();
+            $user = $result->row_array();
             return $user;
         }
     }
 
     function getUserQuizzes()
-    {
-        $x = $this->db->get_where('users',array('email' => $this->session->email));
-        $user = $x->row_array();
-        	
-                                                  	
-        $res = $this->db->get_where('quiz',array('authorId' => $user['id']));
-        if ($res->num_rows() == 0) {
+    {    	
+        $result = $this->db->get_where('quiz',array('authorId' =>$this->session->id));
+        if ($result->num_rows() == 0) {
             return false;
         }
         else {
             $quizzes = array();
-            foreach ($res->result_array() as $row){
+            foreach ($result->result_array() as $row){
                 $quizzes[] = $row;
             }
             return $quizzes;
@@ -82,7 +76,6 @@ class User extends CI_Model {
   
     function updateUsername($user)
      {
-        
         $this->db->set('username', $user['username']);
         $this->db->where("id",$user['id']);
         $result = $this->db->update('users'); 
@@ -101,7 +94,6 @@ class User extends CI_Model {
         $this->db->set('password', $hashed_password);
         $this->db->where("id",$id);
         $result = $this->db->update('users'); 
-
         if($result)       
         {
             return true; 
@@ -112,33 +104,19 @@ class User extends CI_Model {
 
      function updateScore($score)
      {
-        $email = $this->session->email;
-        $res = $this->db->get_where('users',array('email' => $email));
-        if ($res->num_rows() != 1) {
-            return false;
-        }
-   
-        $id =  $res->row()->id;
-
-        $this->db->where('id', $id);
+        $this->db->where('id',$this->session->id);
         $this->db->set('score', 'score+'.$score, FALSE);
         $result = $this->db->update('users');
-
         if($result)       
         {
             return true; 
         }
-        return false ;  
-        
+        return false ;   
      }
+
      function getUserRank()
      {
-        $email = $this->session->email;
-        // $res = $this->db->get_where('users',array('email' => $email));
-        // if ($res->num_rows() != 1) {
-        //     return false;
-        // }
-        // else{
+        $id = $this->session->id;
         $this->db->select('username,email, score');
         $this->db->order_by('score', 'DESC');
         $result = $this->db->get('users'); 
@@ -155,37 +133,12 @@ class User extends CI_Model {
 
                 }
             }
-            // $x = array();
-            // foreach ( $users as $element ) {
-            //     if ( $email == $element->email ) {
-            //         $x[] = $element;
-            //         // return $element;
-            //     }
-            // }
         
                 return $users[0];
         }
-                // $users = array();
-                // foreach ($result->result_array() as $row){
-                //     // $users[] = $row->username;
-                // }
-                // return $users[0];
-                // $user=array();
-                // $count = 0; 
-                // foreach ($result->result_array() as $row){
-                //     $count = $count + 1;
-                //   if( $row->email == $email){
-                //     $user[] = $row;
-                //     $user[] = $count;
-                //   }
-                // }
-                // return $user;
-            
-        // }
      
      function getMaxScoreUsers()
      {
-      
         $this->db->select('username, score');
         $this->db->order_by('score', 'DESC');
         $this->db->limit(2);
@@ -200,31 +153,6 @@ class User extends CI_Model {
                 $users[] = $row;
             }
             return $users;
-        }
-        
-    }
-
-     
-     
-    // function updateName($userId,$username)
-    // function updatePassword($userId,$username)
-    // function updateScore($userId,$username)
-    // function update($userId,$username)
-    // function getHighestScoreUsers($userId,$username)
-
-    // function updateName($userId,$username)
-    // {
-    //     $res = $this->db->get_where('users',array('email' => $email, 'password' => $password));
-    //     if ($res->num_rows() != 1) {
-    //         return false;
-    //     }
-    //     else {
-    //         $row = $res->row();
-    //         return $row['userId']; 
-    //     }
-    // }
-
-  
-
- 
+        }   
+    } 
 }

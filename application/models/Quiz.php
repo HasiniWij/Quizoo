@@ -1,6 +1,5 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-// https://www.figma.com/file/LpoyRh9WIOJVAUoiQCxk9e/Server-side?node-id=0%3A1&t=zpeBGX8tGwSGDgll-0
 class Quiz extends CI_Model {
     public function __construct()
     {
@@ -11,12 +10,7 @@ class Quiz extends CI_Model {
 
     function saveQuiz($title,$category)
     {
-        $email = $this->session->email;
-        $res = $this->db->get_where('users',array('email' => $email));
-        if ($res->num_rows() != 1) {
-            return false;
-        }
-        $result = $this->db->insert('quiz',array('title' => $title,'category'=>$category,'authorId' => $res->row()->id));
+        $result = $this->db->insert('quiz',array('title' => $title,'category'=>$category,'authorId' => $this->session->id));
         if ($result)
         {
             $insertId = $this->db->insert_id();
@@ -66,13 +60,13 @@ class Quiz extends CI_Model {
      }
 
      function getQuizzesFromCategory($category){
-        $res = $this->db->get_where('quiz',array('category' => $category));
-        if ($res->num_rows() == 0) {
+        $result = $this->db->get_where('quiz',array('category' => $category));
+        if ($result->num_rows() == 0) {
             return false;
         }
         else {
             $quizzes = array();
-            foreach ($res->result_array() as $row){
+            foreach ($result->result_array() as $row){
                 $quizzes[] = $row;
             }
             return $quizzes;
@@ -107,24 +101,35 @@ class Quiz extends CI_Model {
     }
 
     function getQuiz($quizId){
-        $res = $this->db->get_where('quiz',array('quizId' => $quizId));
-        if ($res->num_rows() != 1) {
+        $result = $this->db->get_where('quiz',array('quizId' => $quizId));
+        if ($result->num_rows() != 1) {
             return false;
         }
         else {
-            $quiz = $res->row_array();
+            $quiz = $result->row_array();
             return $quiz;
         }
     }
 
+    function getTags($quizId){
+        $result = $this->db->get_where('tag',array('quizId' => $quizId));
+        $tags = array();
+        if ($result->num_rows() != 0) {
+            foreach ($result->result_array() as $row){
+                $tags[] = $row;
+            }
+        }
+        return $tags;
+    }
+
     function getQuestionAnswers($quizId){
-        $res = $this->db->get_where('questionAnswer',array('quizId' => $quizId));
-        if ($res->num_rows() == 0) {
+        $result = $this->db->get_where('questionAnswer',array('quizId' => $quizId));
+        if ($result->num_rows() == 0) {
             return false;
         }
         else {
             $questions = array();
-            foreach ($res->result_array() as $row){
+            foreach ($result->result_array() as $row){
                 $questions[] = $row;
             }
             return $questions;
@@ -132,12 +137,7 @@ class Quiz extends CI_Model {
      }
 
     function likeQuiz($quizId){
-        $email = $this->session->email;
-        $res = $this->db->get_where('users',array('email' => $email));
-        if ($res->num_rows() != 1) {
-            return false;
-        }
-        $result = $this->db->insert('userQuiz',array('quizId' => $quizId,'userId' => $res->row()->id));
+        $result = $this->db->insert('userQuiz',array('quizId' => $quizId,'userId' => $this->session->id));
         if ($result)
         {
             return true;
@@ -148,12 +148,7 @@ class Quiz extends CI_Model {
      }
 
      function unlikeQuiz($quizId){
-        $email = $this->session->email;
-        $res = $this->db->get_where('users',array('email' => $email));
-        if ($res->num_rows() != 1) {
-            return false;
-        }
-        $this->db->where(array('quizId' => $quizId,'userId' => $res->row()->id));
+        $this->db->where(array('quizId' => $quizId,'userId' => $this->session->id));
         $result = $this->db->delete('userQuiz');
         if ($result)
         {
@@ -188,28 +183,47 @@ class Quiz extends CI_Model {
     function getUserLikedQuizzes(){
         
         $quizzes = array();
-        $email = $this->session->email;
-        $res = $this->db->get_where('users',array('email' => $email));
-        if ($res->num_rows() != 1) {
-            return false;
-        }
-
-        $result = $this->db->get_where('userQuiz',array('userId' => $res->row()->id));
+        $result = $this->db->get_where('userQuiz',array('userId' => $this->session->id));
         if ($result->num_rows() !== 0) {
             foreach ($result->result_array() as $row){
                 $quizzes[] = $row;
-
             }
         }
-
         return $quizzes;
      }
+     function updateQuiz($quizId,$title, $category){
+         $this->db->where('quizId', $quizId);
+         $result= $this->db->update('quiz', array('title' => $title,'category' =>$category)); 
+         if ($result)
+         {
+             return true;
+         }
+         else {
+             return false;
+         }
+     }
+     
+     function deleteTag($tagIds){
+        $this->db->where_in('tagId', $tagIds);
+        $result = $this->db->delete('tag');
+        if ($result)
+        {
+            return true;
+        }
+        else {
+            return false;
+        }
+     }
 
+     function deleteQuestionAnswers($quizId){
+        $result = $this->db->delete('questionAnswer', array('quizId' => $quizId));  
+        if ($result)
+        {
+            return true;
+        }
+        else {
+            return false;
+        }
 
-    
-
-
-  
-
- 
+     }
 }

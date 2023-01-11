@@ -27,19 +27,35 @@ class QuizController extends RestController {
         $this->load->model('quiz');
         $this->load->model('user');
     }
-   
-    public function editQuiz_get()
-    {
-        $this->load->view('editQuiz.php');
-    }
     
+    public function createQuizView_get()
+    {
+        if($this->user->isUserLoggedIn()){
+            $this->load->view('createQuiz');
+        }
+        else{
+            redirect('/UserAuthentication/signinView');
+        }   
+    }
+
+    public function editQuizView_get()
+    {
+        if($this->user->isUserLoggedIn()){
+            $id =  $this->uri->segment(3,false);
+            $this->load->view('editQuiz',array('quizId' => $id));
+        }
+        else{
+            redirect('/UserAuthentication/signinView');
+        }   
+    }
 
     public function quiz_get()
     {
         $id =  $this->uri->segment(3,false);
         $quizzesDetails = $this->quiz->getQuiz($id);
         $questionAnswers = $this->quiz->getQuestionAnswers($id);
-        $quizzes = $quizzesDetails + array('questionAnswers' => $questionAnswers);
+        $tags = $this->quiz->getTags($id);
+        $quizzes = $quizzesDetails + array('questionAnswers' => $questionAnswers) + array('tags'=>$tags);
         print json_encode($quizzes);
     }
 
@@ -61,15 +77,19 @@ class QuizController extends RestController {
         print json_encode($quizzes);
     }
 
-    public function viewQuiz_get()
+    public function QuizView_get()
     {
         $quizId =  $this->uri->segment(3,false);
-        $this->load->view('viewQuiz.php',array('quizId' => $quizId));
+        if($this->user->isUserLoggedIn()){
+            $this->load->view('viewQuiz.php',array('quizId' => $quizId));
+        }
+        else{
+            redirect('/UserAuthentication/signinView');
+        }
     }
 
     public function quiz_post()
     {
-        
         $data = file_get_contents('php://input');
         $dataArray = json_decode($data, true);
         $quizId = $this->quiz->saveQuiz($dataArray['title'],$dataArray['category']);
@@ -85,16 +105,40 @@ class QuizController extends RestController {
         print json_encode(array('status' => 200,'msg' => 'ok'));
     }
 
+    public function quiz_put()
+    {
+        $data = file_get_contents('php://input');
+        $dataArray = json_decode($data, true);
+        $quiz = $this->quiz->updateQuiz($dataArray['quizId'],$dataArray['title'],$dataArray['category']);
+        if(count($dataArray['removedTags'])>0){
+            $deleteTag = $this->quiz->deleteTag($dataArray['removedTags']);
+        }
+        $deleteQuestionAnswers =  $this->quiz->deleteQuestionAnswers($dataArray['quizId']);
+        foreach($dataArray['newTags'] as $tag){
+            $this->quiz->saveTags($dataArray['quizId'],$tag['tag']);
+        }
+
+        foreach($dataArray['questionAnswers'] as $question){
+            $this->quiz->saveQuestion($dataArray['quizId'],$question);
+        }
+        print(x);
+        }
+
     public function categories_get()
     {
         $categories = $this->quiz->getCategories();
         print json_encode($categories);
     }
 
-    public function viewFinishQuiz_get()
+    public function finishQuizView_get()
     {
         $score =  $this->uri->segment(3,false);
-        $this->load->view('finishQuiz',array('score' => $score));
+        if($this->user->isUserLoggedIn()){
+            $this->load->view('finishQuiz',array('score' => $score));
+        }
+        else{
+            redirect('/UserAuthentication/signinView');
+        }
     }
 
     public function voteQuiz_post()
@@ -103,16 +147,19 @@ class QuizController extends RestController {
         $dataArray = json_decode($data, true);
         $vote =  $dataArray['vote'];
         $quizId =  $dataArray['quizId'];
-        $this->quiz->updateNumberOfQuizLikes($vote,$quizId);
+        $updateNumberResult = $this->quiz->updateNumberOfQuizLikes($vote,$quizId);
         if($vote=='like'){
-            print 'in';
-            $this->quiz->likeQuiz($quizId);
+            $updateUserQuizResult = $this->quiz->likeQuiz($quizId);
         }
         else{
-            print 'out';
-            $this->quiz->unlikeQuiz($quizId); 
+            $updateUserQuizResult = $this->quiz->unlikeQuiz($quizId); 
         }
-        print json_encode(array('status' => 200,'msg' => 'Success'));
+        if($updateNumberResult && $updateUserQuizResult){
+            print json_encode(array('status' => 200,'msg' => 'Success'));
+        }
+        else{
+            print json_encode(array('status' => 500,'msg' => 'error'));
+        }
     }
 
     public function userLikedQuizzes_get(){

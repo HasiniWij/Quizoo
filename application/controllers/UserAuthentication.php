@@ -27,51 +27,14 @@ class UserAuthentication extends RestController {
         $this->load->library('session');
     }
 
-    public function index_get()
-    {
-        $this->load->view('signin');
-    }
-
-    public function profile_get()
-    {
-        if($this->user->isUserLoggedIn()){
-            $this->load->view('profile');
-        }
-        else{
-            $this->load->view('signin');
-        }
-    }
-
-    public function leaderbord_get()
-    {
-      $this->load->view('leaderboad');
-        
-    }
-
-    public function maxScoreUsers_get()
-    {
-        $users = $this->user->getMaxScoreUsers();
-        print json_encode($users);
-    }
-    public function userRank_get()
-    {
-        $user = $this->user->getUserRank();
-        print json_encode($user);
-    }
-    
-    public function home_get()
-    {
-        if($this->user->isUserLoggedIn()){
-            $this->load->view('home');
-        }
-        else{
-            $this->load->view('signin');
-        }
-    }
-
-    public function signup_get()
+    public function signupView_get()
     {
         $this->load->view('signup');
+    }
+
+    public function signinView_get()
+    {
+        $this->load->view('signin');
     }
 
     public function user_get()
@@ -97,10 +60,10 @@ class UserAuthentication extends RestController {
         }
         else{
             if($this->user->updateUsername($user)){
-                echo json_encode(array('status' => 200,'msg' => 'Success'));
+                print json_encode(array('status' => 200,'msg' => 'Success'));
             }
             else{
-                echo json_encode(array('status' => 500,'msg' => 'error'));
+                print json_encode(array('status' => 500,'msg' => 'error'));
             }
         }
     }
@@ -111,10 +74,10 @@ class UserAuthentication extends RestController {
         $username = $this->input->post('username');
         $password = $this->input->post('password');
 
-        $result = $this->user->createUser($email,$username,$password);
-        if($result){
+        $id = $this->user->createUser($email,$username,$password);
+        if($id){
             $this->session->is_logged_in = true;
-            $this->session->email = $email;
+            $this->session->id = $id;
             print json_encode(array('status' => 200,'msg' => 'ok'));
         }
         else{
@@ -127,11 +90,10 @@ class UserAuthentication extends RestController {
     {
         $email = $this->input->post('email');
         $password = $this->input->post('password');
-        $result = $this->user->authenticateUser($email,$password);
-        // print $result;
-        if ($result) {
+        $id = $this->user->authenticateUser($email,$password);
+        if ($id) {
             $this->session->is_logged_in = true;
-            $this->session->email = $email;
+            $this->session->id = $id;
             print true;
         }
         else {
@@ -142,19 +104,7 @@ class UserAuthentication extends RestController {
     public function logout_get()
     {
         $this->session->is_logged_in = false;
-        $this->load->view('signin');
+        redirect('/UserAuthentication/signinView');
     }
-
-    public function score_post()
-    {
-        $score =  $this->uri->segment(3,false);
-        // print $score;
-        $this->user->updateScore($score);
-    }
-    // public function updat
-
-
-    // , view leaderboard, 
-    
 
 }

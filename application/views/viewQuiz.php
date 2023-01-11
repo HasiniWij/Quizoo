@@ -145,7 +145,7 @@
 			});
 			var User = Backbone.Model.extend({
 				url: function () {
-					return "<?php echo base_url() ?>index.php/userAuthentication/score/"+score;
+					return "<?php echo base_url() ?>index.php/scoreController/score/"+score;
 				},
 				idAttribute: "userId",
 				defaults: {
@@ -153,8 +153,6 @@
 
 				}
 			});
-
-		
 
 			var user = new User();
 			var quiz = new Quiz();
@@ -226,7 +224,7 @@
 						console.log(questionNumber);
 						if(quiz.get('questionAnswers').length<questionNumber){
 							user.save();
-							window.location.href = '<?php echo base_url()?>index.php/QuizController/viewFinishQuiz/'+score;
+							window.location.href = '<?php echo base_url()?>index.php/QuizController/finishQuizView/'+score;
 							console.log("finish")
 							console.log(score)
 						}
@@ -238,7 +236,7 @@
 
 					},
 					cancelEvent: function (event){
-						window.location.href = '<?php echo base_url()?>index.php/userAuthentication/home';
+						window.location.href = '<?php echo base_url()?>index.php/';
 					}
 				}
 			)
@@ -247,76 +245,6 @@
 		});
 		</script>
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		<!-- <script language="Javascript">
-		$(document).ready(function () {
-
-			var category = "food";
-			var Quiz = Backbone.Model.extend({
-				// url: function () {s
-				// 	return "<?php echo base_url() ?>index.php/Celebs/celeb?name=";
-				// },
-				idAttribute: "quizId",
-				defaults: {
-					title:null,
-					numberOfLikes:null
-				}
-			});
-
-			var Quizzes = Backbone.Collection.extend(
-				{
-					model : Quiz,
-					url: "<?php echo base_url() ?>index.php/QuizController/quiz?"+category
-				}
-			)
-
-			// create collections object
-			var quizzes = new Quizzes();
-
-			var ContentAreaView = Backbone.View.extend(
-				{
-					model: quizzes, // connect view to collections object
-					el : $('#contentArea'), // connect view to page area
-					events : {
-						// "click #categoryButton" : "selectCategoryEvent"
-					},
-					initialize : function () {
-						quizzes.fetch({async:false});
-						console.log(quizzes);
-						this.render();
-					},
-					render : function () {
-						var self = this;
-							// categories.each(function (c) {
-							// 	console.log(c.get('category'));
-							// 	var button = "<button type='button' id='categoryButton'>" + c.get('category')  + "</button>";
-							// 	$( "#buttonArea" ).append(button);
-							// })
-					},
-					selectCategoryEvent : function (event) {
-						// document.location.href = "<?php echo base_url()?>index.php/userAuthentication/home";
-						// location.href='https://google.com';
-						// window.location.pathname = ('/newpage.html')
-						// $('.cname').remove()
-						// $(event.currentTarget).parent().append("<div class='cname'>"
-						// 	+ celebs.get(event.currentTarget.id).get('name') + " is <br/>"
-						// 	+ celebs.get(event.currentTarget.id).get('age') + " years old"
-						// 	+ "</div>")
-					}
-				}
-			)
-		});
-		// 	var contentArea = new ContentAreaView();
-		// });
-		</script> -->
-	<!-- Button trigger modal -->
 
     </body>
     </html>

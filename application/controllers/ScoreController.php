@@ -18,41 +18,51 @@ use chriskacerguis\RestServer\RestController;
  * @license         MIT
  * @link            https://github.com/chriskacerguis/codeigniter-restserver
  */
-class SearchQuizController extends RestController {
+class ScoreController extends RestController {
 
     function __construct()
     {
         parent::__construct();
         $this->load->model('user');
+        $this->load->library('session');
     }
 
-    public function index_get()
+    public function leaderBoardView_get()
     {
         if($this->user->isUserLoggedIn()){
-            $this->load->view('home');
+            $this->load->view('leaderboad');
         }
         else{
             redirect('/UserAuthentication/signinView');
-        }
+        } 
     }
-
-    public function browseView_get()
+    public function maxScoreUsers_get()
     {
-        if($this->user->isUserLoggedIn()){
-            $this->load->view('browse');
-        }
-        else{
-            redirect('/UserAuthentication/signinView');
-        }
-        
+        $users = $this->user->getMaxScoreUsers();
+        print json_encode($users);
+    }
+    public function userRank_get()
+    {
+        $user = $this->user->getUserRank();
+        print json_encode($user);
     }
     
-    public function browseQuizzesView_get()
+    public function score_post()
     {
-        $queryType = $this->uri->segment(3,false);
-        $query = $this->uri->segment(4,false);
+        $score =  $this->uri->segment(3,false);
+        $result = $this->user->updateScore($score);
+        if($result){
+            print json_encode(array('status' => 200,'msg' => 'Success'));
+        }
+        else{
+            print json_encode(array('status' => 500,'msg' => 'error'));
+        }
+    }  
+
+    public function profile_get()
+    {
         if($this->user->isUserLoggedIn()){
-            $this->load->view('browseQuiz',array('queryType' => $queryType,'query' => $query));
+            $this->load->view('profile');
         }
         else{
             redirect('/UserAuthentication/signinView');

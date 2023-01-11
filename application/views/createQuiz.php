@@ -146,17 +146,15 @@
 
 			var Quiz = Backbone.Model.extend({
 				url: function () {
-					return "<?php echo base_url() ?>index.php/QuizController/quiz/" +<?php echo $quizId ?>;
+					return "<?php echo base_url() ?>index.php/QuizController/quiz";
 				},
 				idAttribute: "quizId",
 				defaults: {
 					quizId: null,
 					title: null,
 					category: null,
-					questionAnswers: null,
-					tags: null,
-					newTags: null,
-					removedTags: null,
+					numberOfLikes: null,
+					authorId: null
 				}
 			});
 
@@ -167,147 +165,29 @@
 			var questionCount = 1;
 			var questionIndexes = [];
 			var questions = [];
-			var removedTags = [];
 
-			function showTags() {
-				tagObjects = quiz.get('tags');
-				tagCount = quiz.get('tags').length + 1;
-				var count = 1;
-				tagObjects.forEach(function (tagObject) {
-					tagObject.count = count;
-					$("#tagArea").append(
-						'<div class="tagStyle" id="tagDiv' + count + '"><p>' + tagObject.tag + '</p><button id="' + count + '" class="removeTag" data-tag="' + count + '">X</button></div>'
-					);
-					count++;
-				})
-			}
+			var ContentAreaView = Backbone.View.extend(
+				{
+					model: quiz,
+					el: $('#contentArea'),
+					events: {
+						"click #addQuestion": "addQuestionEvent",
+						"click #finish": "finishEvent",
+						"click #addTag": "addTagEvent",
+						"click .removeTag": "removeTagEvent",
+						"click .removeQuestion": "removeQuestionEvent"
+					},
+					initialize: function () {
+						this.addQuestionEvent()
+					},
+					render: function () {
+					},
 
-			function showQuestions() {
-				quiz.get('questionAnswers').forEach(function (question) {
-					showQuestion();
-					document.getElementById("answerA" + (questionCount - 1).toString()).value = question.answerA;
-					document.getElementById("answerB" + (questionCount - 1).toString()).value = question.answerB;
-					document.getElementById("answerC" + (questionCount - 1).toString()).value = question.answerC;
-					document.getElementById("answerD" + (questionCount - 1).toString()).value = question.answerD;
-					document.getElementById("question" + (questionCount - 1).toString()).value = question.question;
-					document.getElementById("answerB1").checked = true;
-					// "answer"+question.correctAnswer.toUpperCase()+(questionCount-1).toString()
-				});
+					addQuestionEvent: function (event) {
+						questionIndexes.push(questionCount);
 
-			}
-
-			var ContentAreaView = Backbone.View.extend({
-				model: quiz,
-				el: $('#contentArea'),
-				events: {
-					"click #addQuestion": "addQuestionEvent",
-					"click #finish": "finishEvent",
-					"click #addTag": "addTagEvent",
-					"click .removeTag": "removeTagEvent",
-					"click .removeQuestion": "removeQuestionEvent"
-				},
-				initialize: function () {
-					quiz.fetch({ async: false });
-					this.render()
-				},
-				render: function () {
-					document.getElementById("title").value = quiz.get('title');
-					document.querySelector('#category').value = quiz.get('category');
-					showTags();
-					showQuestions();
-				},
-
-				addQuestionEvent: function (event) {
-					showQuestion();
-				},
-
-				removeTagEvent: function (event) {
-					var tagNumber = $(event.currentTarget).data('tag');
-					const indexOfObject = tagObjects.findIndex(object => {
-						return object.count === tagNumber;
-					});
-					if (tagObjects[indexOfObject].tagId) {
-						removedTags.push(tagObjects[indexOfObject].tagId)
-					};
-					tagObjects.splice(indexOfObject, 1);
-					$("#tagDiv" + tagNumber).remove();
-					console.log(tagObjects);
-					console.log(removedTags)
-				},
-
-				addTagEvent: function (event) {
-					var newTag = $("#tag").val().toLowerCase().trim();
-					if (newTag) {
-						tagObjects.push({ "tag": newTag, "count": tagCount });
-						$("#tagArea").append('<div class="tagStyle" id="tagDiv' + tagCount + '"><p>' + newTag + '</p><button id="' + tagCount + '" class="removeTag" data-tag="' + tagCount + '">X</button></div>');
-						tagCount++;
-						document.getElementById("tag").value = '';
-					}
-					
-				},
-
-				finishEvent: function (event) {
-					questions = [];
-					$("#errorMessage").empty();
-					if ($("#title").val() === '') {
-						$("#errorMessage").append('<h4>Please fill in the title</h5>');
-						return;
-					}
-					if (questionIndexes.length == 0) {
-						$("#errorMessage").append('<h4>There needs to be at least one question for a quiz to be created</h5>');
-						return;
-					}
-					var isAllCompleted = true;
-					questionIndexes.forEach(function (index) {
-						if ($("#question" + index).val() && $("#answerA" + index).val() && $("#answerB" + index).val() && $("#answerC" + index).val() && $("#answerD" + index).val() && $("input[type='radio'][name='answer" + index + "']:checked").val()) {
-							var questionAnswer = {
-								question: $("#question" + index).val(),
-								answerA: $("#answerA" + index).val(),
-								answerB: $("#answerB" + index).val(),
-								answerC: $("#answerC" + index).val(),
-								answerD: $("#answerD" + index).val(),
-								correctAnswer: $("input[type='radio'][name='answer" + index + "']:checked").val()
-							};
-							questions.push(questionAnswer);
-						}
-						else {
-							isAllCompleted = false;
-							$("#errorMessage").empty();
-							$("#errorMessage").append('<h4>Please fill in all question and answer fields and select a correct answer for all questions</h5>');
-							return;
-						}
-					});
-
-					if (isAllCompleted) {
-						var newTags = tagObjects.filter(function (tag) {
-							return !tag.tagId;
-						});
-
-						quiz.set({
-							"title": $("#title").val(),
-							"category": $("#category").val(),
-							"newTags": newTags,
-							"removedTags": removedTags,
-							"questionAnswers" :questions
-						});
-
-						quiz.save();
-					    window.location.href = '<?php echo base_url() ?>index.php';
-					}
-				},
-					removeQuestionEvent: function (event) {
-						var questionCount = $(event.currentTarget).data('question');
-						const removingIndex = questionIndexes.indexOf(questionCount);
-						questionIndexes.splice(removingIndex, 1);
-						$("#questionContainer" + questionCount).remove();
-					}
-				}
-			);
-
-			var contentView = new ContentAreaView();
-			function showQuestion() {
-				$("#questionAnswersArea").append(
-					`<div class="container questionContainer" id="questionContainer` + questionCount + `">
+						$("#questionAnswersArea").append(
+							`<div class="container questionContainer" id="questionContainer` + questionCount + `">
 								<div class='row' style="float:right">
 									<div class="col-md-10">	</div>
 									<div class="col-md-1 input-style">
@@ -332,7 +212,7 @@
 										<input class="form-control rounded" placeholder="Enter a answer" aria-label="answerA" id="answerA`+ questionCount + `"/>    
 									</div>		
 									<div class="col-md-1 input-style">
-										<input type="radio" id="answerA`+ questionCount + `" name="answer` + questionCount + `" value="a">
+										<input type="radio" id="answerA" name="answer`+ questionCount + `" value="a">
 									</div>
 								</div>
 				
@@ -344,7 +224,7 @@
 										<input class="form-control rounded" placeholder="Enter a answer" aria-label="answerB" id="answerB`+ questionCount + `"/> 
 									</div>
 									<div class="col-md-1 input-style">
-										<input type="radio" id="answerB`+ questionCount + `" name="answer` + questionCount + `" value="b">
+										<input type="radio" id="answerB" name="answer`+ questionCount + `" value="b">
 									</div>
 								</div>
 								<div class='row'>
@@ -355,7 +235,7 @@
 										<input class="form-control rounded" placeholder="Enter a answer" aria-label="answerC" id="answerC`+ questionCount + `"/>    
 									</div>
 									<div class="col-md-1 input-style">
-										<input type="radio" id="answerC`+ questionCount + `" name="answer` + questionCount + `" value="c">
+										<input type="radio" id="answerC" name="answer`+ questionCount + `" value="c">
 									</div>
 								</div>
 								<div class='row'>
@@ -366,14 +246,83 @@
 										<input class="form-control rounded" placeholder="Enter a answer" aria-label="answerD" id="answerD`+ questionCount + `"/>    
 									</div>
 									<div class="col-md-1 input-style">
-										<input type="radio" id="answerD`+ questionCount + `" name="answer` + questionCount + `" value="d">
+										<input type="radio" id="answerD" name="answer`+ questionCount + `" value="d">
 									</div>
 								</div>
 							</div>`
-				);
-				questionIndexes.push(questionCount);
-				questionCount++;
-			}
+						);
+						questionCount = questionCount + 1;
+
+					},
+
+					finishEvent: function (event) {
+						$("#errorMessage").empty();
+						if ($("#title").val() === '') {
+							$("#errorMessage").append('<h4>Please fill in the title</h5>');
+							return;
+						}
+						if (questionIndexes.length == 0) {
+							$("#errorMessage").append('<h4>There needs to be at least one question for a quiz to be created</h5>');
+							return;
+						}
+						var isAllCompleted = true;
+						questionIndexes.forEach(function (index) {
+							if ($("#question" + index).val() && $("#answerA" + index).val() && $("#answerB" + index).val() && $("#answerC" + index).val() && $("#answerD" + index).val() && $("input[type='radio'][name='answer" + index + "']:checked").val()) {
+								var questionAnswer = {
+									question: $("#question" + index).val(),
+									answerA: $("#answerA" + index).val(),
+									answerB: $("#answerB" + index).val(),
+									answerC: $("#answerC" + index).val(),
+									answerD: $("#answerD" + index).val(),
+									correctAnswer: $("input[type='radio'][name='answer" + index + "']:checked").val()
+								};
+								questions.push(questionAnswer);
+							}
+							else {
+								isAllCompleted = false;
+								$("#errorMessage").empty();
+								$("#errorMessage").append('<h4>Please fill in all question and answer fields and select a correct answer for all questions</h5>');
+							}
+						});
+
+						if (isAllCompleted) {
+							let tags = tagObjects.map(({ tag }) => tag);
+							quiz.save({
+								"title": $("#title").val(),
+								"category": $("#category").val(),
+								"tags": tags,
+								"questionAnswers": questions
+							});
+							window.location.href = '<?php echo base_url() ?>index.php';
+						}
+					},
+					addTagEvent: function (event) {
+						var newTag = $("#tag").val().toLowerCase().trim();
+						if (newTag) {
+							tagObjects.push({ "tag": newTag, "id": tagCount });
+							$("#tagArea").append('<div class="tagStyle" id="tagDiv' + tagCount + '"><p>' + newTag + '</p><button id="' + tagCount + '" class="removeTag" data-tag="' + tagCount + '">X</button></div>');
+							tagCount = tagCount + 1;
+						}
+					},
+					removeTagEvent: function (event) {
+						var tagNumber = $(event.currentTarget).data('tag');
+						const indexOfObject = tagObjects.findIndex(object => {
+							return object.id === tagNumber;
+						});
+						tagObjects.splice(indexOfObject, 1);
+						$("#tagDiv" + tagNumber).remove();
+					},
+					removeQuestionEvent: function (event) {
+						var questionId = $(event.currentTarget).data('question');
+						const removingIndex = questionIndexes.indexOf(questionId);
+						questionIndexes.splice(removingIndex, 1);
+						$("#questionContainer" + questionId).remove();
+					}
+				}
+			);
+
+			var contentView = new ContentAreaView();
+
 		});
 	</script>
 </body>

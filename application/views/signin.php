@@ -2,11 +2,9 @@
     <html lang="en">
     <head>
         <title>Quizoo</title>
-		<!-- Latest compiled and minified CSS -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-		
 		<style>
-			body { padding-top: 70px; } /* needed to position navbar properly */
+			body { padding-top: 70px; } 
 
 			img {
 				height: 175px;
@@ -24,7 +22,7 @@
                 <h1>Signin to </h1>
 				<h2>Quizoo</h2>
 				<p>If you don't have a account you can register now</p>
-				<p>You can <a href="<?php echo base_url()?>index.php/userAuthentication/signup">Register Here</a></p>
+				<p>You can <a href="<?php echo base_url()?>index.php/userAuthentication/signupView">Register Here</a></p>
             </div>
             <div class="col-md-6">
 				<h2>Sign in</h2>
@@ -52,7 +50,7 @@
 							);
 							obj.done(function(data){
 								if(data){
-									document.location.href = "<?php echo base_url()?>index.php/userAuthentication/home";
+									document.location.href = "<?php echo base_url()?>index.php";
 								}
 								else{
 									document.getElementById("errorMessage").innerHTML =
@@ -61,72 +59,7 @@
 							});
 
 						});
-
 					});
-		</script>
-
-		<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.0/backbone-min.js"></script> -->
-		<!-- <script language="Javascript">
-		$(document).ready(function () {
-			var Celeb = Backbone.Model.extend({
-				url: function () {
-					var urlstr = 
-						"<?php echo base_url() ?>index.php/Celebs/celeb?name="
-						+ this.get("name");
-					return urlstr;
-				},
-				idAttribute: "_id",
-				defaults: {
-					name: null,
-					imageurl: null,
-					age: null
-				}
-			});
-
-			var Celebrities = Backbone.Collection.extend(
-				{
-					model : Celeb,
-					url: "http://localhost:8999/6cosc005w/ilikecelebs/index.php/celebs/celeb"
-				}
-			)
-
-			// create collections object
-			var celebs = new Celebrities();
-
-			var ContentAreaView = Backbone.View.extend(
-				{
-					model: celebs, // connect view to collections object
-					el : $('#contentarea'), // connect view to page area
-					events : {
-						"click img" : "displayEvent"
-					},
-					initialize : function () {
-						// when view object created, we want something to
-						// happen to load initial content
-						celebs.fetch({async:false})
-						this.render()
-					},
-					render : function () {
-						// display content
-						var self = this;
-						celebs.each(function (c) {
-							var cimg = "<div class='celebimg'><img id='" + c.get('_id') + "' src='" + c.get('imageurl') + "'>"
-							self.$el.append(cimg)
-						})
-					},
-					displayEvent : function (event) {
-						$('.cname').remove()
-						$(event.currentTarget).parent().append("<div class='cname'>"
-							+ celebs.get(event.currentTarget.id).get('name') + " is <br/>"
-							+ celebs.get(event.currentTarget.id).get('age') + " years old"
-							+ "</div>")
-					}
-				}
-			)
-
-			var contentview = new ContentAreaView();
-		}); -->
-		</script>
-			
+		</script>			
     </body>
     </html>
