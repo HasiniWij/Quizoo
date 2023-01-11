@@ -23,8 +23,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-//$config['base_url'] = 'http://localhost:8888/6cosc005w/ciapp/';
-$config['base_url'] = 'https://w1761085.users.ecs.westminster.ac.uk/ciapp/';
+$config['base_url'] = 'https://w1761085.users.ecs.westminster.ac.uk/quizoo/';
 
 /*
 |--------------------------------------------------------------------------
@@ -237,8 +236,7 @@ $config['log_threshold'] = 2;
 | application/logs/ directory. Use a full server path with trailing slash.
 |
 */
-// $config['log_path'] = '/Applications/MAMP/htdocs/6cosc005w/ciapp/application/logs/';
-$config['log_path'] = '/home/student/085/w1761085/public_html/ciapp/application/logs/';
+$config['log_path'] = '/home/student/085/w1761085/public_html/quizoo/application/logs/';
 
 /*
 |--------------------------------------------------------------------------
